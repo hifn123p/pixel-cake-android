@@ -5,7 +5,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
-  # 允许在 GitHub 网页手动触发，方便随时验证
+  # 允许在 GitHub 网页手动触发
   workflow_dispatch:
 
 concurrency:
@@ -86,16 +86,25 @@ jobs:
           path: app/build/reports/lint-results-debug.html
           retention-days: 7
 
+  # secrets 上下文不允许出现在 job 级 if 中（GitHub 会直接判定 workflow 非法，
+  # 导致整个文件解析失败、一个 job 都不创建）。因此单独用一个 job 探测，
+  # 再把结果以 output 的形式传给 release。
+  check-signing:
+    name: Check signing secrets
+    runs-on: ubuntu-latest
+    outputs:
+      has-keystore: ${{ steps.check.outputs.has }}
+    steps:
+      - name: Probe KEYSTORE_BASE64
+        id: check
+        run: echo "has=${{ secrets.KEYSTORE_BASE64 != '' }}" >> "$GITHUB_OUTPUT"
+
   release:
     name: Signed Release
     runs-on: ubuntu-latest
     timeout-minutes: 40
-    needs: build
-    # 仅在 main 分支推送、且已配置签名 Secrets 时执行
-    if: >
-      github.ref == 'refs/heads/main' &&
-      github.event_name == 'push' &&
-      secrets.KEYSTORE_BASE64 != ''
+    needs: [build, check-signing]
+    if: needs.check-signing.outputs.has-keystore == 'true'
 
     steps:
       - name: Checkout
