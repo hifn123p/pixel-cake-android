@@ -1,0 +1,12 @@
+# gradlew 必须是 LF：CRLF 会让 Linux runner 报
+# "/bin/sh^M: bad interpreter"，是 Windows 提交 Android 工程最常见的 CI 失败原因
+* text=auto eol=lf
+
+# Windows 批处理脚本保持 CRLF
+*.bat text eol=crlf
+
+# 二进制文件禁止任何换行转换
+*.jar binary
+*.png binary
+*.jks binary
+*.keystore binary

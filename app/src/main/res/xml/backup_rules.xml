@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- 只备份预设与用户偏好；照片与缓存不进备份 -->
+    <include domain="sharedpref" path="." />
+    <include domain="database" path="presets.db" />
+    <exclude domain="file" path="cache" />
+</full-backup-content>

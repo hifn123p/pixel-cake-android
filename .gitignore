@@ -1,0 +1,26 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+/.kotlin
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# 模块构建产物
+app/build/
+app/release/
+app/debug/
+
+# 签名文件永远不要入库
+*.jks
+*.keystore
+*.p12
+!debug.keystore
+
+# NDK / CMake 产物（第 2 步引入 LibRaw 后会产生）
+app/.cxx/
+app/build/intermediates/cxx/
