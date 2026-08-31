@@ -52,7 +52,9 @@ fun Context.probeCapabilities(): DeviceCapabilities {
         sdkInt = Build.VERSION.SDK_INT,
         abi = Build.SUPPORTED_ABIS.firstOrNull().orEmpty(),
         wideColorGamut = display?.isWideColorGamut ?: false,
-        hdrTypes = display?.hdrCapabilities?.supportedHdrTypes.orEmpty().map(::hdrTypeName),
+        // supportedHdrTypes 是 IntArray?，orEmpty() 只对 Array/List/String 有定义，
+        // 基本类型数组不适用，因此先 map 再兜底
+        hdrTypes = display?.hdrCapabilities?.supportedHdrTypes?.map(::hdrTypeName) ?: emptyList(),
         refreshRateHz = display?.mode?.refreshRate ?: 0f,
         totalMemMiB = memInfo.totalMem / MIB,
         availMemMiB = availMiB,

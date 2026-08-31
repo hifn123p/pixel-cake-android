@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -16,7 +18,12 @@ android {
         versionName = "0.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        resourceConfigurations += setOf("zh-rCN", "en")
+    }
+
+    // 只保留中英文资源，剔除 AndroidX 等依赖带入的多语言字符串（约可省几百 KB）。
+    // resourceConfigurations 已在 AGP 8.8 起废弃，8.13 中报 deprecation。
+    androidResources {
+        localeFilters += listOf("zh-rCN", "en")
     }
 
     // 签名配置只在 CI 注入了 KEYSTORE_PATH 时创建。
@@ -54,10 +61,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = libs.versions.jvmTarget.get()
-    }
-
     buildFeatures {
         compose = true
     }
@@ -69,6 +72,13 @@ android {
     }
 
     // 第 2 步引入 LibRaw 后，此处添加 externalNativeBuild { cmake { ... } }
+}
+
+// kotlinOptions 在 KGP 2.2 已废弃，改用 compilerOptions DSL
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.fromTarget(libs.versions.jvmTarget.get()))
+    }
 }
 
 dependencies {
