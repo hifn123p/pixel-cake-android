@@ -1,5 +1,7 @@
 # PixelCake Android
 
+[![Android CI](https://github.com/hifn123p/pixel-cake-android/actions/workflows/android.yml/badge.svg)](https://github.com/hifn123p/pixel-cake-android/actions/workflows/android.yml)
+
 Sony A7C2 照片的本地 RAW 调色应用。全流程离线，广色域（Display P3）端到端管线。
 
 技术栈：Kotlin + Jetpack Compose + Material 3，构建由 GitHub Actions 完成。
@@ -42,6 +44,24 @@ Sony A7C2 照片的本地 RAW 调色应用。全流程离线，广色域（Displ
 | `KEY_PASSWORD` | 密钥密码 |
 
 未配置时 release job 自动跳过，不影响 Debug 构建。
+
+取 APK：Actions → 对应 run → Artifacts → `pixelcake-debug-*`。
+
+### 关于 release job 的探测方式
+
+GitHub **不允许 `secrets` 出现在 job 级 `if` 条件里**——一旦写了，整个 workflow
+文件会被判为非法，一个 job 都不创建（表现为 run 立刻失败、`total_count: 0`、日志 404）。
+所以这里用一个 `check-signing` job 探测 `KEYSTORE_BASE64` 是否非空，再把结果以
+`outputs` 传给 `release` 的 `if`。
+
+### 当前 lint 状态
+
+0 error。剩余 10 条 warning 均为版本提示，非阻塞：
+
+- `OldTargetApi` — targetSdk 36 尚未对齐最新 SDK，待实际适配后再升
+- `AndroidGradlePluginVersion` — 有 AGP 9.x / Gradle 8.14+；本项目刻意停在
+  AGP 8.13.2（8.x 末版），避免未经适配的大版本跳跃
+- `GradleDependency` / `NewerVersionAvailable` — 依赖库有更新版本
 
 ## 路线图
 
